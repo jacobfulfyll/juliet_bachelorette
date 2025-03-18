@@ -23,10 +23,10 @@ const VerificationStep2 = ({ onVerify }) => {
     setIsVerifying(true);
     setError('');
     
-    // Wait a moment to show the flicker effect before transitioning
+    // Wait for the slower flicker effect to complete before transitioning
     setTimeout(() => {
       onVerify(name);
-    }, 600);
+    }, 2500);
   };
 
   return (
@@ -67,36 +67,52 @@ const VerificationStep2 = ({ onVerify }) => {
                   type="button"
                   className={`p-3 border rounded-lg text-center transition-colors ${
                     selectedName === name && isVerifying
-                      ? 'bg-rose-500 text-white border-rose-500'
+                      ? 'border-rose-400'
                       : 'bg-white text-gray-800 border-gray-300 hover:border-rose-400 hover:bg-rose-50'
                   }`}
                   onClick={() => handleNameSelect(name)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.95 }}
                   animate={selectedName === name && isVerifying ? {
-                    scale: [1, 1.05, 1],
-                    backgroundColor: ['rgb(244, 63, 94)', 'rgb(255, 255, 255)', 'rgb(244, 63, 94)'],
-                    color: ['rgb(255, 255, 255)', 'rgb(244, 63, 94)', 'rgb(255, 255, 255)'],
+                    scale: [1, 1.02, 1, 1.02, 1],
+                    boxShadow: [
+                      '0 0 0 rgba(244, 63, 94, 0)',
+                      '0 0 8px rgba(244, 63, 94, 0.4)', 
+                      '0 0 4px rgba(244, 63, 94, 0.2)',
+                      '0 0 8px rgba(244, 63, 94, 0.4)',
+                      '0 0 0 rgba(244, 63, 94, 0)'
+                    ],
+                    backgroundColor: [
+                      'rgba(255, 255, 255, 1)',
+                      'rgba(254, 242, 242, 1)', 
+                      'rgba(251, 231, 231, 1)',
+                      'rgba(254, 242, 242, 1)',
+                      'rgba(255, 255, 255, 1)'
+                    ],
+                    color: [
+                      'rgba(107, 114, 128, 1)',
+                      'rgba(225, 29, 72, 0.8)', 
+                      'rgba(225, 29, 72, 0.9)',
+                      'rgba(225, 29, 72, 0.8)',
+                      'rgba(107, 114, 128, 1)'
+                    ],
+                    borderColor: [
+                      'rgba(209, 213, 219, 1)',
+                      'rgba(244, 63, 94, 0.6)', 
+                      'rgba(244, 63, 94, 0.8)',
+                      'rgba(244, 63, 94, 0.6)',
+                      'rgba(209, 213, 219, 1)'
+                    ],
                     transition: { 
-                      duration: 0.5,
-                      repeat: 0, 
-                      repeatType: "loop" 
+                      duration: 2.5,
+                      repeat: 1,
+                      repeatType: "reverse",
+                      ease: "easeInOut",
+                      times: [0, 0.25, 0.5, 0.75, 1]
                     }
                   } : {}}
                 >
                   {name}
-                  {selectedName === name && isVerifying && (
-                    <motion.span 
-                      className="ml-2 inline-block"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    >
-                      <svg className="h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                    </motion.span>
-                  )}
                 </motion.button>
               </AnimatePresence>
             ))}
