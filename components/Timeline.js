@@ -1,354 +1,197 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import React from 'react';
 
-// TimelineSection component for the alternating timeline sections
-const TimelineSection = ({ content, index, isActive }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, {
-    margin: "-10% 0px -10% 0px",
-    once: false
-  });
-  
-  // Determine if this section should be on the left or right side
-  const isLeft = index % 2 === 0;
-  
-  // These variants control the animation states
-  const variants = {
-    hidden: { 
-      opacity: 0, 
-      x: isLeft ? -50 : 50, 
-      filter: "blur(10px)",
-    },
-    visible: { 
-      opacity: 1, 
-      x: 0, 
-      filter: "blur(0px)",
-    },
-    exit: { 
-      opacity: 0, 
-      x: isLeft ? -50 : 50, 
-      filter: "blur(10px)",
-    }
-  };
-  
-  return (
-    <section 
-      id={`section-${index}`} 
-      ref={ref}
-      className={`min-h-[70vh] w-full flex items-center justify-center ${isLeft ? 'justify-end' : 'justify-start'} relative py-16`}
-    >
-      {/* Timeline dot on the center line */}
-      <motion.div 
-        className={`absolute left-1/2 top-1/2 w-6 h-6 bg-rose-500 rounded-full -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center`}
-        initial={{ scale: 0 }}
-        animate={isInView ? { scale: 1 } : { scale: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="w-2 h-2 bg-white rounded-full"></div>
-      </motion.div>
-      
-      {/* Content container */}
-      <motion.div
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
-        exit="exit"
-        variants={variants}
-        transition={{ 
-          duration: 0.6,
-          ease: [0.22, 1, 0.36, 1]
-        }}
-        className={`w-[45%] transform-gpu ${isLeft ? 'mr-12' : 'ml-12'}`}
-      >
-        <div className="bg-white/30 backdrop-blur-md rounded-xl shadow-xl p-6 md:p-8 w-full transform-gpu">
-          {content}
-        </div>
-      </motion.div>
-    </section>
-  );
-};
-
-// Activity content component
-const ActivityContent = ({ activity }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.div 
-      whileHover={{ 
-        scale: 1.03, 
-        boxShadow: "0 15px 30px -10px rgba(0, 0, 0, 0.2)"
-      }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      className="bg-white/40 backdrop-blur-sm rounded-xl shadow-lg p-5 relative overflow-hidden"
-    >
-      {/* Animated accent corner */}
-      <motion.div 
-        className="absolute -top-10 -right-10 w-20 h-20 bg-rose-500/20 rounded-full"
-        animate={{
-          scale: isHovered ? 1.2 : 1,
-          opacity: isHovered ? 0.3 : 0.2
-        }}
-      />
-
-      <div className="flex items-center mb-2 relative z-10">
-        <motion.div 
-          className="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center flex-shrink-0 mr-3"
-          animate={{
-            scale: isHovered ? [1, 1.2, 1] : 1
-          }}
-          transition={{
-            duration: 0.5,
-            repeat: isHovered ? Infinity : 0,
-            repeatType: "reverse"
-          }}
-        >
-          <div className="w-2 h-2 bg-white rounded-full"></div>
-        </motion.div>
-        <h4 className="font-bold text-xl text-rose-600">{activity.dayPart}</h4>
-      </div>
-      
-      <motion.h3 
-        className="font-bold text-xl mb-3 relative z-10"
-        animate={{
-          x: isHovered ? 3 : 0
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 300
-        }}
-      >
-        {activity.title}
-      </motion.h3>
-      
-      <p className="text-gray-600 mb-4 relative z-10">{activity.description}</p>
-      
-      <motion.div 
-        className="mt-auto bg-rose-100/70 rounded-lg aspect-video flex items-center justify-center overflow-hidden relative z-10"
-        whileHover={{ scale: 1.05 }}
-        transition={{ duration: 0.3 }}
-        animate={{
-          boxShadow: isHovered ? "0 5px 15px rgba(244, 63, 94, 0.2)" : "0 0 0 rgba(244, 63, 94, 0)"
-        }}
-      >
-        <img 
-          src={activity.image || "/placeholder.jpg"} 
-          alt={activity.title} 
-          className="w-full h-full object-cover" 
-        />
-        <div className="absolute inset-0 flex items-center justify-center text-rose-600 bg-white/30 backdrop-blur-sm">
-          <p className="font-semibold">Photo coming soon</p>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-};
-
-// Intro content
-const IntroContent = ({ guestName }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="bg-white/50 backdrop-blur-lg rounded-xl shadow-2xl border border-white/40 p-6 md:p-8 w-full max-w-5xl mx-auto transform-gpu relative z-20"
-    >
-      <h2 className="text-4xl font-bold mb-4 text-rose-600">Welcome, {guestName}!</h2>
-      <h3 className="text-3xl font-bold mb-6 text-rose-600">Weekend Itinerary</h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <motion.div 
-          className="bg-white/40 backdrop-blur-sm rounded-xl shadow-lg p-5"
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          whileHover={{ scale: 1.03 }}
-        >
-          <h4 className="text-2xl font-bold mb-4 text-rose-600">Location</h4>
-          <p className="text-xl mb-2 text-rose-600">Beautiful Boca Raton, FL</p>
-          <p className="text-gray-600 mb-4">May 23rd - May 26th</p>
-          
-          <div className="bg-rose-100/70 rounded-lg aspect-video flex items-center justify-center overflow-hidden">
-            <img src="/house.png" alt="Boca Raton beachfront" className="w-full h-full object-cover" />
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          className="bg-white/40 backdrop-blur-sm rounded-xl shadow-lg p-5"
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          whileHover={{ scale: 1.03 }}
-        >
-          <h4 className="text-2xl font-bold mb-4 text-rose-600">Getting There</h4>
-          <ul className="space-y-3 text-gray-600">
-            <li className="flex items-start">
-              <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
-                <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-              </div>
-              <p>Fly into Fort Lauderdale (FLL) or West Palm Beach (PBI) Airports</p>
-            </li>
-            <li className="flex items-start">
-              <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
-                <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-              </div>
-              <p>Uber to our beachfront accommodation</p>
-            </li>
-            <li className="flex items-start">
-              <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
-                <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-              </div>
-              <p>Pack your swimsuit, sunscreen, and dancing shoes!</p>
-            </li>
-          </ul>
-        </motion.div>
-      </div>
-    </motion.div>
-  );
-};
-
-// Main Timeline component with vertical timeline design
-const Timeline = ({ guestName }) => {
-  const [activeSection, setActiveSection] = useState(0);
-  const scrollContainerRef = useRef(null);
-  
-  // Restructured itinerary as a flat list of activities by parts of day
-  const timelineActivities = [
-    {
-      dayPart: 'Morning',
-      day: 'May 23rd',
-      title: 'Bagels and bask in the sun',
-      description: 'Start the day with delicious bagels and enjoy the beautiful Boca Raton sunshine together.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Afternoon',
-      day: 'May 23rd',
-      title: 'Pool day',
-      description: 'Relax by the pool, soak up the sun, and enjoy refreshing drinks with the girls.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Evening',
-      day: 'May 23rd',
-      title: 'Movie night',
-      description: 'Cozy up for a fun movie night with all of Juliet\'s favorites and some bubbly.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Late Night',
-      day: 'May 23rd',
-      title: 'Tea',
-      description: 'Wind down with some tea and heart-to-heart conversations.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Morning',
-      day: 'May 24th',
-      title: 'Bagels and walk',
-      description: 'Enjoy another morning with bagels followed by a refreshing walk along the beautiful coastline.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Afternoon',
-      day: 'May 24th',
-      title: 'Beach day',
-      description: 'Head to the beach for sun, sand, and ocean fun with the entire group.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Evening',
-      day: 'May 24th',
-      title: 'Dinner in Del Ray',
-      description: 'Get dressed up for a fabulous dinner experience in delightful Del Ray.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Late Night',
-      day: 'May 24th',
-      title: 'Dancing dancing dancing',
-      description: 'Put on your dancing shoes and hit the town for a night of fun and dancing.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Morning',
-      day: 'May 25th',
-      title: 'Sleep',
-      description: 'Sleep in and recover from our fun night out.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Afternoon',
-      day: 'May 25th',
-      title: 'Pickleball',
-      description: 'Get active with a friendly pickleball tournament – no experience necessary!',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Evening',
-      day: 'May 25th',
-      title: 'Dinner at the club',
-      description: 'Enjoy an elegant dinner at a local club with gorgeous views and delicious cuisine.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Late Night',
-      day: 'May 25th',
-      title: 'PJ party',
-      description: 'Back to our accommodations for a classic pajama party with games and treats.',
-      image: '/placeholder.jpg'
-    },
-    {
-      dayPart: 'Morning',
-      day: 'May 26th',
-      title: 'Departure',
-      description: 'Everyone flies home after a great weekend. Goodbye hugs and see you at the wedding!',
-      image: '/placeholder.jpg'
-    }
-  ];
-  
-  // Handle scroll to update active section
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!scrollContainerRef.current) return;
-      
-      const sectionElements = Array.from(document.querySelectorAll('section'));
-      
-      for (let i = 0; i < sectionElements.length; i++) {
-        const section = sectionElements[i];
-        const rect = section.getBoundingClientRect();
-        const inView = rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2;
-        
-        if (inView) {
-          setActiveSection(i);
-          break;
-        }
+// Timeline data with lorem ipsum text
+const timelineData = [
+  {
+    date: "May 23rd",
+    entries: [
+      {
+        time: "Morning",
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.",
+        image: "/placeholder.jpg"
+      },
+      {
+        time: "Afternoon",
+        description: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
+        image: "/placeholder.jpg"
+      },
+      {
+        time: "Evening",
+        description: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.",
+        image: "/placeholder.jpg"
+      },
+      {
+        time: "Late Night",
+        description: "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi.",
+        image: "/placeholder.jpg"
       }
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-  
-  // Scroll to section function
-  const scrollToSection = (sectionIndex) => {
-    const element = document.getElementById(`section-${sectionIndex}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-  
+    ]
+  },
+  {
+    date: "May 24th",
+    entries: [
+      {
+        time: "Morning",
+        description: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
+        image: "/placeholder.jpg"
+      },
+      {
+        time: "Afternoon",
+        description: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore.",
+        image: "/placeholder.jpg"
+      },
+      {
+        time: "Evening",
+        description: "Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod.",
+        image: "/placeholder.jpg"
+      },
+      {
+        time: "Late Night",
+        description: "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
+        image: "/placeholder.jpg"
+      }
+    ]
+  },
+  {
+    date: "May 25th",
+    entries: [
+      {
+        time: "Morning",
+        description: "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
+        image: "/placeholder.jpg"
+      },
+      {
+        time: "Afternoon",
+        description: "Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est.",
+        image: "/placeholder.jpg"
+      },
+      {
+        time: "Evening",
+        description: "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
+        image: "/placeholder.jpg"
+      },
+      {
+        time: "Late Night",
+        description: "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.",
+        image: "/placeholder.jpg"
+      }
+    ]
+  },
+  {
+    date: "May 26th",
+    entries: [
+      {
+        time: "Morning",
+        description: "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
+        image: "/placeholder.jpg"
+      },
+      {
+        time: "Afternoon",
+        description: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        image: "/placeholder.jpg"
+      }
+    ]
+  }
+];
+
+// TimelineItem component for individual timeline entries
+const TimelineItem = ({ 
+  time, 
+  description, 
+  image, 
+  itemRef,
+  containerRef
+}) => {
+  const { scrollYProgress } = useScroll({
+    target: itemRef,
+    container: containerRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Create transforms for opacity that fade in and out based on scroll position
+  const opacity = useTransform(scrollYProgress, 
+    [0, 0.1, 0.4, 0.7, 1], 
+    [0, 1, 1, 0.3, 0]
+  );
+
   return (
     <div 
-      className="fixed inset-0 overflow-y-auto overflow-x-hidden scroll-smooth perspective-1000"
+      ref={itemRef}
+      className="flex flex-col md:flex-row justify-start py-10 md:py-16 min-h-[300px]"
+    >
+      {/* Left side with time and description */}
+      <div className="relative pl-20 md:pl-24 pr-4 md:w-1/2">
+        {/* Timeline dot */}
+        <div className="absolute left-[38px] md:left-[46px] top-1 w-5 h-5 rounded-full bg-white border-2 border-rose-500 flex items-center justify-center">
+          <div className="h-2 w-2 rounded-full bg-rose-500" />
+        </div>
+        
+        {/* Content that fades with scroll */}
+        <motion.div style={{ opacity }} className="space-y-2">
+          <h4 className="text-lg md:text-xl font-semibold text-rose-600">
+            {time}
+          </h4>
+          <p className="text-sm md:text-base text-gray-600">
+            {description}
+          </p>
+        </motion.div>
+      </div>
+      
+      {/* Right side with image */}
+      <motion.div 
+        style={{ opacity }} 
+        className="pl-20 md:pl-4 pr-4 mt-4 md:mt-0 md:w-1/2"
+      >
+        <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-rose-200 shadow-md">
+          <div className="absolute inset-0 bg-rose-50 flex items-center justify-center">
+            <img 
+              src={image}
+              alt="Timeline event"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 flex items-center justify-center text-rose-600 bg-white/30 backdrop-blur-sm">
+              <p className="font-semibold">Photo coming soon</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+// Main Timeline component
+const Timeline = ({ guestName }) => {
+  const containerRef = useRef(null);
+  const [entries, setEntries] = useState([]);
+  
+  // Process timeline data and create refs for each entry
+  useEffect(() => {
+    // Calculate total number of entries
+    const totalEntries = timelineData.reduce((total, day) => total + day.entries.length, 0);
+    
+    // Create an array of entries with React.createRef instead of useRef
+    const allEntries = [];
+    
+    timelineData.forEach(day => {
+      day.entries.forEach(entry => {
+        allEntries.push({
+          ...entry,
+          ref: React.createRef() // Use createRef instead of useRef
+        });
+      });
+    });
+    
+    setEntries(allEntries);
+  }, []);
+
+  return (
+    <div 
+      ref={containerRef}
+      className="fixed inset-0 overflow-y-auto overflow-x-hidden scroll-smooth"
       style={{ 
         backgroundImage: 'radial-gradient(circle at center, #ffe5e5 0%, #fff9f9 50%, #fff5f7 100%)',
-        perspective: '1000px'
       }}
     >
       {/* Fixed Background Elements - Animated Particles */}
@@ -381,7 +224,7 @@ const Timeline = ({ guestName }) => {
       </div>
       
       {/* Main Title - Fixed Header */}
-      <div className="fixed top-0 left-0 w-full bg-gradient-to-b from-white/90 to-transparent backdrop-blur-sm z-10 py-6">
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-sm py-4 border-b border-rose-200">
         <motion.h1 
           className="text-4xl md:text-5xl font-bold text-rose-600 text-center"
           initial={{ opacity: 0, y: -30 }}
@@ -391,7 +234,7 @@ const Timeline = ({ guestName }) => {
           Juliet's Bachelorette
         </motion.h1>
       </div>
-      
+
       {/* Back to top button */}
       <motion.button
         className="fixed bottom-8 right-8 z-10 p-3 bg-rose-500 text-white rounded-full shadow-lg hover:bg-rose-600 transition-colors"
@@ -407,28 +250,106 @@ const Timeline = ({ guestName }) => {
           <path d="M12 19V5M5 12l7-7 7 7"/>
         </svg>
       </motion.button>
-      
-      {/* Vertical timeline line - Fixed behind all content */}
-      <div className="fixed left-1/2 top-[45vh] h-[9999px] w-[4px] bg-rose-200 transform -translate-x-1/2 z-[-999]"></div>
-      
-      {/* Scroll container with timeline sections */}
-      <div ref={scrollContainerRef} className="relative pt-16 pb-20">
-        {/* Intro Section - Full Width */}
-        <section 
-          id={`section-0`} 
-          className="min-h-[90vh] w-full flex items-center justify-center relative py-16 mb-16"
+
+      {/* Welcome section */}
+      <div className="max-w-7xl mx-auto py-20 px-4 md:px-8 lg:px-10">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="bg-white/50 backdrop-blur-lg rounded-xl shadow-2xl border border-white/40 p-6 md:p-8 w-full max-w-5xl mx-auto transform-gpu relative z-20"
         >
-          <IntroContent guestName={guestName} />
-        </section>
+          <h2 className="text-4xl font-bold mb-4 text-rose-600">Welcome, {guestName}!</h2>
+          <h3 className="text-3xl font-bold mb-6 text-rose-600">Weekend Itinerary</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <motion.div 
+              className="bg-white/40 backdrop-blur-sm rounded-xl shadow-lg p-5"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              whileHover={{ scale: 1.03 }}
+            >
+              <h4 className="text-2xl font-bold mb-4 text-rose-600">Location</h4>
+              <p className="text-xl mb-2 text-rose-600">Beautiful Boca Raton, FL</p>
+              <p className="text-gray-600 mb-4">May 23rd - May 26th</p>
+              
+              <div className="bg-rose-100/70 rounded-lg aspect-video flex items-center justify-center overflow-hidden">
+                <img src="/house.png" alt="Boca Raton beachfront" className="w-full h-full object-cover" />
+              </div>
+            </motion.div>
+            
+            <motion.div 
+              className="bg-white/40 backdrop-blur-sm rounded-xl shadow-lg p-5"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              whileHover={{ scale: 1.03 }}
+            >
+              <h4 className="text-2xl font-bold mb-4 text-rose-600">Getting There</h4>
+              <ul className="space-y-3 text-gray-600">
+                <li className="flex items-start">
+                  <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
+                    <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                  <p>Fly into Fort Lauderdale (FLL) or West Palm Beach (PBI) Airports</p>
+                </li>
+                <li className="flex items-start">
+                  <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
+                    <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                  <p>Uber to our beachfront accommodation</p>
+                </li>
+                <li className="flex items-start">
+                  <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
+                    <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                  <p>Pack your swimsuit, sunscreen, and dancing shoes!</p>
+                </li>
+              </ul>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Timeline section */}
+      <div className="relative max-w-7xl mx-auto pb-20">
+        {/* Vertical timeline line */}
+        <div className="absolute left-10 md:left-12 top-0 bottom-0 w-[2px] bg-rose-200" />
         
-        {/* Timeline Sections - Each activity gets its own alternating section */}
-        {timelineActivities.map((activity, index) => (
-          <TimelineSection 
-            key={index + 1}
-            index={index + 1}
-            content={<ActivityContent activity={activity} />}
-            isActive={activeSection === index + 1}
-          />
+        {/* Timeline content by date */}
+        {timelineData.map((day, dayIndex) => (
+          <div key={dayIndex} className="mb-16">
+            {/* Day heading - sticky */}
+            <div className="sticky top-24 z-30 bg-white/80 backdrop-blur-sm py-4 border-y border-rose-200">
+              <h3 className="text-xl md:text-3xl font-bold text-rose-600 pl-20 md:pl-24">
+                {day.date}
+              </h3>
+            </div>
+            
+            {/* Timeline items for this day */}
+            {day.entries.map((entry, entryIndex) => {
+              const entryFullIndex = timelineData.slice(0, dayIndex).reduce((acc, day) => acc + day.entries.length, 0) + entryIndex;
+              const currentRef = entries[entryFullIndex]?.ref;
+              
+              return currentRef ? (
+                <TimelineItem 
+                  key={entryIndex}
+                  time={entry.time}
+                  description={entry.description}
+                  image={entry.image}
+                  itemRef={currentRef}
+                  containerRef={containerRef}
+                />
+              ) : null;
+            })}
+          </div>
         ))}
       </div>
     </div>
