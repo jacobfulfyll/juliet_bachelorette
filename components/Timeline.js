@@ -18,23 +18,27 @@ const timelineData = [
     entries: [
       {
         time: "Morning",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.",
-        image: "/placeholder.jpg"
+        title: "Bagels and Coffee",
+        description: "Wake up in beautiful sunny Florida with a cup of coffee and some New York quality bagels.",
+        image: "/st_andrews_entry.png"
       },
       {
         time: "Afternoon",
+        title: "Pool Day",
         description: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
-        image: "/placeholder.jpg"
+        image: "/pool.png"
       },
       {
         time: "Evening",
+        title: "Movie Night",
         description: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.",
-        image: "/placeholder.jpg"
+        image: "/movie.png"
       },
       {
         time: "Late Night",
+        title: "Tea and Tea",
         description: "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi.",
-        image: "/placeholder.jpg"
+        image: "/house.png"
       }
     ]
   },
@@ -43,23 +47,27 @@ const timelineData = [
     entries: [
       {
         time: "Morning",
+        title: "Morning Walk",
         description: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
-        image: "/placeholder.jpg"
+        image: "/bedroom.jpeg"
       },
       {
         time: "Afternoon",
+        title: "Beach Day",
         description: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore.",
-        image: "/placeholder.jpg"
+        image: "/beach.png"
       },
       {
         time: "Evening",
+        title: "Del Ray Dinner",
         description: "Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod.",
-        image: "/placeholder.jpg"
+        image: "/delray.png"
       },
       {
         time: "Late Night",
+        title: "Dancing Dancing Dancing",
         description: "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
-        image: "/placeholder.jpg"
+        image: "/dancing.png"
       }
     ]
   },
@@ -68,23 +76,27 @@ const timelineData = [
     entries: [
       {
         time: "Morning",
+        title: "Donec sollicitudin molestie malesuada",
         description: "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
-        image: "/placeholder.jpg"
+        image: "/passed_out.png"
       },
       {
-        time: "Afternoon",
+        time: "Chill and Walk",
+        title: "Quisque velit nisi pretium ut",
         description: "Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est.",
-        image: "/placeholder.jpg"
+        image: "/versailles.png"
       },
       {
         time: "Evening",
+        title: "Dinner @ The Club",
         description: "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
-        image: "/placeholder.jpg"
+        image: "/dining.png"
       },
       {
         time: "Late Night",
+        title: "Relax and Enjoy",
         description: "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.",
-        image: "/placeholder.jpg"
+        image: "/games.jpeg"
       }
     ]
   },
@@ -93,14 +105,16 @@ const timelineData = [
     entries: [
       {
         time: "Morning",
+        title: "Bye Bye Boca",
         description: "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
-        image: "/placeholder.jpg"
+        image: "/airport.png"
       },
-      {
-        time: "Afternoon",
-        description: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        image: "/placeholder.jpg"
-      }
+      // {
+      //   time: "Afternoon",
+      //   title: "Cras ultricies ligula sed magna",
+      //   description: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      //   image: "/placeholder.jpg"
+      // }
     ]
   }
 ];
@@ -108,251 +122,648 @@ const timelineData = [
 // TimelineItem component for individual timeline entries
 const TimelineItem = ({ 
   time, 
-  description, 
+  description,
+  title,
   image, 
-  index
+  index,
+  date,
+  totalSlides
 }) => {
+  // Calculate a position factor (0-1) based on where we are in the timeline
+  const positionFactor = index / totalSlides;
+  
+  // Determine layout variation based on position in timeline
+  // As we progress, we'll vary the layout for visual interest
+  const layoutVariation = React.useMemo(() => {
+    if (index % 4 === 0) {
+      return "centered"; // Date centered above, image below
+    } else if (index % 4 === 1) {
+      return "left-right"; // Date left, image right (default)
+    } else if (index % 4 === 2) {
+      return "right-left"; // Date right, image left (reversed)
+    } else {
+      return "overlay"; // Date overlaid on image
+    }
+  }, [index]);
+
+  // Check if time is Morning for special animation
+  const isMorning = time === "Morning";
+
   return (
     <motion.div 
-      className="flex flex-col md:flex-row justify-start py-10 md:py-16 min-h-[300px]"
-      initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50, scale: 0.9 }}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
-      exit={{ opacity: 0, x: index % 2 === 0 ? 50 : -50, scale: 0.9 }}
-      transition={{ duration: 0.7 }}
+      className={`flex flex-col w-full h-full px-[5%] justify-center ${layoutVariation === "centered" ? "items-center" : "items-start"}`}
+      initial={{ opacity: 0, y: 30, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -30, scale: 0.97 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
     >
-      {/* Left side with time and description */}
-      <div className="relative pl-20 md:pl-24 pr-4 md:w-1/2">
-        {/* Timeline dot with pulsating effect */}
-        <motion.div 
-          className="absolute left-[38px] md:left-[46px] top-1 w-5 h-5 rounded-full bg-white border-2 border-rose-500 flex items-center justify-center"
-          animate={{
-            boxShadow: [
-              "0 0 0 0 rgba(244, 63, 94, 0)",
-              "0 0 0 10px rgba(244, 63, 94, 0.3)",
-              "0 0 0 0 rgba(244, 63, 94, 0)"
-            ]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            repeatType: "loop"
-          }}
-        >
-          <div className="h-2 w-2 rounded-full bg-rose-500" />
-        </motion.div>
-        
-        {/* Content */}
-        <div className="space-y-2">
-          <h4 className="text-lg md:text-xl font-semibold text-rose-600">
-            {time}
-          </h4>
-          <p className="text-sm md:text-base text-gray-600">
-            {description}
-          </p>
-        </div>
-      </div>
-      
-      {/* Right side with image */}
-      <div className="pl-20 md:pl-4 pr-4 mt-4 md:mt-0 md:w-1/2">
-        <motion.div 
-          className="relative w-full aspect-video rounded-lg overflow-hidden border border-rose-200 shadow-md"
-          whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(244, 63, 94, 0.2)" }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="absolute inset-0 bg-rose-50 flex items-center justify-center">
-            <img 
-              src={image}
-              alt="Timeline event"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 flex items-center justify-center text-rose-600 bg-white/30 backdrop-blur-sm">
-              <p className="font-semibold">Photo coming soon</p>
-            </div>
+      {layoutVariation === "centered" && (
+        <div className="w-full flex flex-col items-center">
+          {/* Date and Time - Centered layout */}
+          <div className="flex flex-col items-center text-center mb-6">
+            <motion.div
+              className="mb-2"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.5,
+                type: "spring",
+                stiffness: 100
+              }}
+            >
+              <h3 className="text-2xl md:text-4xl font-bold text-rose-600 relative inline-block">
+                {date}
+                <motion.div 
+                  className="absolute -bottom-1 left-0 right-0 h-1 bg-rose-300 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                />
+              </h3>
+            </motion.div>
+            
+            <motion.h4 
+              className="text-xl md:text-2xl font-semibold text-rose-600 mb-4 relative"
+              whileHover={{ scale: 1.05 }}
+            >
+              {time}
+              {isMorning ? (
+                <motion.span 
+                  className="absolute -right-8 -top-2 text-amber-400"
+                  animate={{ 
+                    opacity: [0.7, 1, 0.7],
+                    y: [-2, 2, -2],
+                    scale: [0.9, 1.1, 0.9]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatType: "loop"
+                  }}
+                >
+                  🌞
+                </motion.span>
+              ) : (
+                <motion.span 
+                  className="absolute -right-6 -top-1 text-yellow-400"
+                  animate={{ 
+                    opacity: [0, 1, 0],
+                    rotate: [0, 15, 0],
+                    scale: [0.8, 1.2, 0.8]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "loop"
+                  }}
+                >
+                  ✨
+                </motion.span>
+              )}
+            </motion.h4>
           </div>
-        </motion.div>
-      </div>
+          
+          {/* Image below date in centered layout - now wider */}
+          <motion.div 
+            className="relative w-full max-w-5xl rounded-xl overflow-hidden border border-rose-200 shadow-xl"
+            whileHover={{ scale: 1.02, boxShadow: "0 15px 40px rgba(244, 63, 94, 0.3)" }}
+            style={{ 
+              height: "calc(60vh - 180px)",
+            }}
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ 
+              duration: 0.6, 
+              delay: 0.3,
+              hover: { duration: 0.3 }
+            }}
+          >
+            <div className="absolute inset-0 bg-rose-50 flex items-center justify-center">
+              <img 
+                src={image}
+                alt="Timeline event"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </motion.div>
+          
+          {/* Title and Description below image in centered layout */}
+          <motion.div 
+            className="mt-6 max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.7 }}
+          >
+            <h5 className="text-lg md:text-xl font-bold text-black mb-2 text-center">{title}</h5>
+            <motion.p className="text-base md:text-lg text-gray-600 leading-relaxed bg-white/60 backdrop-blur-sm p-5 rounded-xl shadow-sm border border-rose-100 text-center">
+              {description}
+            </motion.p>
+          </motion.div>
+        </div>
+      )}
+      
+      {(layoutVariation === "left-right" || layoutVariation === "right-left") && (
+        <div className={`flex flex-col md:flex-row w-full justify-center items-center gap-8 ${layoutVariation === "right-left" ? "md:flex-row-reverse" : ""}`}>
+          {/* Date/Time/Description side - now narrower */}
+          <div className={`flex flex-col w-full md:w-[30%] ${layoutVariation === "right-left" ? "md:items-end md:text-right" : "md:items-start md:text-left"}`}>
+            <motion.div
+              className="mb-2"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.5,
+                type: "spring",
+                stiffness: 100
+              }}
+            >
+              <h3 className="text-2xl md:text-4xl font-bold text-rose-600 relative inline-block">
+                {date}
+                <motion.div 
+                  className="absolute -bottom-1 left-0 right-0 h-1 bg-rose-300 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                />
+              </h3>
+            </motion.div>
+            
+            <motion.h4 
+              className="text-xl md:text-2xl font-semibold text-rose-600 mb-4 relative"
+              whileHover={{ scale: 1.05 }}
+            >
+              {time}
+              {isMorning ? (
+                <motion.span 
+                  className={`absolute ${layoutVariation === "right-left" ? "-left-8" : "-right-8"} -top-2 text-amber-400`}
+                  animate={{ 
+                    opacity: [0.7, 1, 0.7],
+                    y: [-2, 2, -2],
+                    scale: [0.9, 1.1, 0.9]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatType: "loop"
+                  }}
+                >
+                  🌞
+                </motion.span>
+              ) : (
+                <motion.span 
+                  className={`absolute ${layoutVariation === "right-left" ? "-left-6" : "-right-6"} -top-1 text-yellow-400`}
+                  animate={{ 
+                    opacity: [0, 1, 0],
+                    rotate: [0, 15, 0],
+                    scale: [0.8, 1.2, 0.8]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "loop"
+                  }}
+                >
+                  ✨
+                </motion.span>
+              )}
+            </motion.h4>
+            
+            <motion.div 
+              className="space-y-2 max-w-md"
+              initial={{ opacity: 0, x: layoutVariation === "right-left" ? 20 : -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4, duration: 0.7 }}
+            >
+              <h5 className={`text-lg font-bold text-black mb-2 ${layoutVariation === "right-left" ? "md:text-right" : "md:text-left"}`}>{title}</h5>
+              <motion.p 
+                className={`text-sm md:text-base text-gray-600 leading-relaxed bg-white/60 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-rose-100 ${layoutVariation === "right-left" ? "md:text-right" : "md:text-left"}`}
+              >
+                {description}
+              </motion.p>
+            </motion.div>
+          </div>
+          
+          {/* Image side - now wider and taller */}
+          <motion.div 
+            className="w-full md:w-[60%]"
+            initial={{ opacity: 0, x: layoutVariation === "right-left" ? -30 : 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.7 }}
+          >
+            <motion.div 
+              className="relative w-full rounded-xl overflow-hidden border border-rose-200 shadow-xl"
+              whileHover={{ scale: 1.03, boxShadow: "0 15px 40px rgba(244, 63, 94, 0.3)" }}
+              style={{ 
+                height: "calc(70vh - 100px)", // Made taller
+              }}
+              transition={{ 
+                hover: { duration: 0.3 }
+              }}
+            >
+              <div className="absolute inset-0 bg-rose-50 flex items-center justify-center">
+                <img 
+                  src={image}
+                  alt="Timeline event"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      )}
+      
+      {layoutVariation === "overlay" && (
+        <div className="w-full flex flex-col items-center">
+          {/* Overlay layout - Image with content overlay */}
+          <motion.div 
+            className="relative w-full max-w-5xl rounded-xl overflow-hidden border border-rose-200 shadow-xl"
+            whileHover={{ scale: 1.02, boxShadow: "0 15px 40px rgba(244, 63, 94, 0.3)" }}
+            style={{ 
+              height: "calc(70vh - 180px)",
+            }}
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ 
+              duration: 0.6, 
+              delay: 0.2,
+              hover: { duration: 0.3 }
+            }}
+          >
+            <div className="absolute inset-0 bg-rose-50 flex items-center justify-center">
+              <img 
+                src={image}
+                alt="Timeline event"
+                className="w-full h-full object-cover"
+              />
+              
+              {/* Content overlay */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <motion.div 
+                  className="bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-lg border border-rose-100 max-w-xl mx-auto text-center"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                >
+                  <h3 className="text-2xl md:text-4xl font-bold text-rose-600 mb-2 relative inline-block">
+                    {date}
+                    <motion.div 
+                      className="absolute -bottom-1 left-0 right-0 h-1 bg-rose-300 rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: "100%" }}
+                      transition={{ delay: 0.7, duration: 0.5 }}
+                    />
+                  </h3>
+                  
+                  <h4 className="text-xl md:text-2xl font-semibold text-rose-600 mb-4 relative">
+                    {time}
+                    {isMorning && (
+                      <motion.span 
+                        className="absolute -right-8 -top-2 text-amber-400"
+                        animate={{ 
+                          opacity: [0.7, 1, 0.7],
+                          y: [-2, 2, -2],
+                          scale: [0.9, 1.1, 0.9]
+                        }}
+                        transition={{ 
+                          duration: 3,
+                          repeat: Infinity,
+                          repeatType: "loop"
+                        }}
+                      >
+                        🌞
+                      </motion.span>
+                    )}
+                  </h4>
+                  
+                  <h5 className="text-lg md:text-xl font-bold text-black mb-2">{title}</h5>
+                  <p className="text-gray-600 leading-relaxed">
+                    {description}
+                  </p>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </motion.div>
   );
 };
 
-// Automatic Timeline component with auto-progression
-const AutomaticTimeline = ({ timelineData }) => {
-  const [currentDayIndex, setCurrentDayIndex] = useState(0);
-  const [currentEntryIndex, setCurrentEntryIndex] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  const [speed, setSpeed] = useState(5); // seconds per entry
+// WelcomeSlide component for the first slide
+const WelcomeSlide = ({ guestName }) => {
+  return (
+    <div className="h-screen flex flex-col justify-center items-center px-4 relative">
+      {/* Title - Only appears on first page */}
+      <AnimatedSection 
+        animationType="scale"
+        className="text-4xl md:text-5xl font-bold text-rose-600 text-center mb-8"
+      >
+        Juliet's Bachelorette
+      </AnimatedSection>
+      
+      <RotatingCard className="p-6 md:p-8 w-full max-w-5xl mx-auto">
+        <AnimatedSection 
+          animationType="fade"
+          className="bg-white/50 backdrop-blur-lg rounded-xl shadow-2xl border border-white/40 p-6 md:p-8 transform-gpu relative z-20"
+        >
+          <h2 className="text-4xl font-bold mb-4 text-rose-600">Welcome, {guestName || 'Guest'}!</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AnimatedSection 
+              animationType="slide"
+              direction="left"
+              delay={0.3}
+              className="bg-white/40 backdrop-blur-sm rounded-xl shadow-lg p-5"
+              whileHover={{ scale: 1.03 }}
+            >
+              <h4 className="text-2xl font-bold mb-4 text-rose-600">Location</h4>
+              <p className="text-xl mb-2 text-rose-600">Beautiful Boca Raton, FL</p>
+              <p className="text-gray-600 mb-4">May 23rd - May 26th</p>
+              
+              <div className="bg-rose-100/70 rounded-lg aspect-video flex items-center justify-center overflow-hidden">
+                <img src="/boca_sunset.jpg" alt="Boca Raton beachfront" className="w-full h-full object-cover" />
+              </div>
+            </AnimatedSection>
+            
+            <AnimatedSection 
+              animationType="slide"
+              direction="right"
+              delay={0.4}
+              className="bg-white/40 backdrop-blur-sm rounded-xl shadow-lg p-5"
+            >
+              <h4 className="text-2xl font-bold mb-4 text-rose-600">Getting There</h4>
+              <StaggeredEntry>
+                <ul className="space-y-3 text-gray-600">
+                  <li className="flex items-start">
+                    <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
+                      <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    </div>
+                    <p>Fly into Fort Lauderdale (FLL) or West Palm Beach (PBI) Airports</p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
+                      <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    </div>
+                    <p>Uber to our beachfront accommodation</p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
+                      <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    </div>
+                    <p>Pack your swimsuit, sunscreen, and dancing shoes!</p>
+                  </li>
+                </ul>
+              </StaggeredEntry>
+            </AnimatedSection>
+          </div>
+        </AnimatedSection>
+      </RotatingCard>
+    </div>
+  );
+};
 
-  // Get current day and entry
-  const currentDay = timelineData[currentDayIndex];
-  const currentEntry = currentDay?.entries[currentEntryIndex];
+// ViewportCarousel component
+const ViewportCarousel = ({ timelineData, guestName }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [showArrows, setShowArrows] = useState(true);
   
-  // Calculate the overall progress
-  const totalEntries = timelineData.reduce((acc, day) => acc + day.entries.length, 0);
-  const currentOverallIndex = timelineData
-    .slice(0, currentDayIndex)
-    .reduce((acc, day) => acc + day.entries.length, 0) + currentEntryIndex;
-  const progress = (currentOverallIndex / totalEntries) * 100;
-
-  // Auto-progress to next entry
-  useEffect(() => {
-    if (!playing) return;
+  // Flatten timeline data into slides
+  const slides = React.useMemo(() => {
+    const allSlides = [];
     
+    // Add welcome slide as the first slide
+    allSlides.push({ type: 'welcome' });
+    
+    // Add timeline entries as slides
+    timelineData.forEach(day => {
+      day.entries.forEach(entry => {
+        allSlides.push({
+          type: 'timeline',
+          date: day.date,
+          ...entry
+        });
+      });
+    });
+    
+    return allSlides;
+  }, [timelineData]);
+  
+  // Show navigation arrows after a delay
+  useEffect(() => {
     const timer = setTimeout(() => {
-      // Check if we need to go to the next day
-      if (currentEntryIndex >= currentDay.entries.length - 1) {
-        if (currentDayIndex < timelineData.length - 1) {
-          setCurrentDayIndex(prev => prev + 1);
-          setCurrentEntryIndex(0);
-        } else {
-          // Loop back to the beginning when reached the end
-          setCurrentDayIndex(0);
-          setCurrentEntryIndex(0);
-        }
-      } else {
-        // Go to the next entry in the same day
-        setCurrentEntryIndex(prev => prev + 1);
-      }
-    }, speed * 1000);
+      setShowArrows(true);
+    }, 5000); // 5 seconds delay
     
     return () => clearTimeout(timer);
-  }, [currentDay, currentDayIndex, currentEntryIndex, playing, speed, timelineData]);
-
-  // Handle user controls
+  }, []);
+  
+  // Handle navigation
   const handlePrevious = () => {
-    if (currentEntryIndex > 0) {
-      setCurrentEntryIndex(prev => prev - 1);
-    } else if (currentDayIndex > 0) {
-      setCurrentDayIndex(prev => prev - 1);
-      setCurrentEntryIndex(timelineData[currentDayIndex - 1].entries.length - 1);
-    }
+    setCurrentSlide(prev => Math.max(prev - 1, 0));
   };
 
   const handleNext = () => {
-    if (currentEntryIndex < currentDay.entries.length - 1) {
-      setCurrentEntryIndex(prev => prev + 1);
-    } else if (currentDayIndex < timelineData.length - 1) {
-      setCurrentDayIndex(prev => prev + 1);
-      setCurrentEntryIndex(0);
-    }
+    setCurrentSlide(prev => Math.min(prev + 1, slides.length - 1));
+  };
+  
+  // Handle dot navigation
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
+  
+  // Calculate timeline progress percentage
+  const progressPercentage = ((currentSlide) / (slides.length - 1)) * 100;
+
+  // Get current day based on slide
+  const getCurrentDay = () => {
+    if (currentSlide === 0) return null;
+    return slides[currentSlide].date;
   };
 
-  const togglePlayPause = () => {
-    setPlaying(prev => !prev);
-  };
-
+  const currentDay = getCurrentDay();
+  
   return (
-    <div className="relative max-w-7xl mx-auto pb-20">
-      {/* Vertical timeline line with glowing effect */}
-      <motion.div 
-        className="absolute left-10 md:left-12 top-0 bottom-0 w-[2px] bg-rose-200"
-        style={{ 
-          background: "linear-gradient(0deg, transparent, #f9a8d4, #f9a8d4, transparent)" 
-        }}
-        animate={{ 
-          boxShadow: ["0 0 5px 0 rgba(244, 63, 94, 0.3)", "0 0 15px 2px rgba(244, 63, 94, 0.5)", "0 0 5px 0 rgba(244, 63, 94, 0.3)"],
-        }}
-        transition={{ 
-          duration: 4,
-          repeat: Infinity,
-          repeatType: "reverse"
-        }}
-      />
+    <div className="h-screen relative overflow-hidden">
+      {/* Improved timeline navigation */}
+      {currentSlide > 0 && (
+        <div className="absolute top-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-sm z-30 px-4 py-3">
+          <div className="max-w-6xl mx-auto">
+            {/* Timeline bar */}
+            <div className="relative h-2 bg-rose-100 rounded-full mb-1">
+              <motion.div
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-rose-400 to-rose-500 rounded-full"
+                style={{ width: `${progressPercentage}%` }}
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercentage}%` }}
+                transition={{ duration: 0.5 }}
+              >
+                <motion.div 
+                  className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-rose-500"
+                  animate={{
+                    boxShadow: [
+                      "0 0 0 0 rgba(244, 63, 94, 0.3)",
+                      "0 0 0 4px rgba(244, 63, 94, 0.2)",
+                      "0 0 0 0 rgba(244, 63, 94, 0.3)"
+                    ]
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    repeatType: "loop"
+                  }}
+                />
+              </motion.div>
+            </div>
+            
+            {/* Day indicators */}
+            <div className="flex justify-between items-center">
+              {timelineData.map((day, index) => {
+                // Check if this day is the current day
+                const isCurrentDay = currentDay === day.date;
+                
+                return (
+                  <motion.button
+                    key={`day-${index}`}
+                    className={`relative px-4 py-1 rounded-full text-sm font-medium transition-all ${
+                      isCurrentDay 
+                        ? 'text-rose-600 font-bold' 
+                        : 'text-gray-500 hover:text-rose-500'
+                    }`}
+                    onClick={() => {
+                      // Find first slide index for this day
+                      const firstSlideIndex = slides.findIndex(slide => 
+                        slide.type === 'timeline' && slide.date === day.date
+                      );
+                      if (firstSlideIndex !== -1) {
+                        goToSlide(firstSlideIndex);
+                      }
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {day.date}
+                    {isCurrentDay && (
+                      <motion.div 
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-rose-500 rounded-full"
+                        layoutId="currentDayIndicator"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
       
-      {/* Day heading */}
-      <motion.div
-        className="sticky top-24 z-30 bg-white/80 backdrop-blur-sm py-4 border-y border-rose-200"
-        key={`day-${currentDayIndex}`}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 20 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h3 className="text-xl md:text-3xl font-bold text-rose-600 pl-20 md:pl-24">
-          {currentDay.date}
-        </h3>
-      </motion.div>
-      
-      {/* Timeline item */}
+      {/* Slides - adjust top padding to accommodate the new header */}
       <AnimatePresence mode="wait">
-        <div key={`day-${currentDayIndex}-entry-${currentEntryIndex}`}>
-          <TimelineItem 
-            time={currentEntry.time}
-            description={currentEntry.description}
-            image={currentEntry.image}
-            index={currentOverallIndex}
-          />
+        <div 
+          key={`slide-${currentSlide}`} 
+          className="h-full flex items-center justify-center"
+          style={{ paddingTop: currentSlide > 0 ? '80px' : '0' }}
+        >
+          {slides[currentSlide].type === 'welcome' ? (
+            <WelcomeSlide guestName={guestName} />
+          ) : (
+            <div className="h-screen w-full flex items-center justify-center">
+              <TimelineItem 
+                time={slides[currentSlide].time}
+                description={slides[currentSlide].description}
+                title={slides[currentSlide].title}
+                image={slides[currentSlide].image}
+                index={currentSlide}
+                date={slides[currentSlide].date}
+                totalSlides={slides.length - 1} // Exclude welcome slide
+              />
+            </div>
+          )}
         </div>
       </AnimatePresence>
       
-      {/* Controls */}
-      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 bg-white/80 backdrop-blur-lg rounded-full shadow-lg px-6 py-3 flex items-center space-x-4">
-        <motion.button
-          className="text-rose-600 hover:text-rose-800 transition-colors"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handlePrevious}
-          aria-label="Previous entry"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
-        </motion.button>
-        
-        <motion.button
-          className="bg-rose-500 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-rose-600 transition-colors"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={togglePlayPause}
-          aria-label={playing ? "Pause" : "Play"}
-        >
-          {playing ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="6" y="4" width="4" height="16"></rect>
-              <rect x="14" y="4" width="4" height="16"></rect>
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-          )}
-        </motion.button>
-        
-        <motion.button
-          className="text-rose-600 hover:text-rose-800 transition-colors"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleNext}
-          aria-label="Next entry"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 18l6-6-6-6"/>
-          </svg>
-        </motion.button>
-        
-        <div className="relative w-40 h-2 bg-gray-200 rounded-full overflow-hidden">
-          <motion.div 
-            className="absolute top-0 left-0 h-full bg-rose-500"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.3 }}
+      {/* Enhanced Navigation Arrows - always visible */}
+      <AnimatePresence>
+        {showArrows && (
+          <>
+            {/* Left Arrow - more prominent */}
+            <motion.button
+              className={`absolute left-6 top-1/2 transform -translate-y-1/2 bg-white text-rose-600 w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-40 ${currentSlide === 0 ? 'opacity-40 cursor-not-allowed' : 'opacity-100 hover:bg-rose-50'}`}
+              whileHover={currentSlide > 0 ? { scale: 1.1, x: -5 } : {}}
+              whileTap={currentSlide > 0 ? { scale: 0.95 } : {}}
+              onClick={handlePrevious}
+              disabled={currentSlide === 0}
+              aria-label="Previous slide"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ 
+                opacity: currentSlide === 0 ? 0.4 : 1, 
+                x: 0,
+                boxShadow: currentSlide === 0 ? "0 4px 6px rgba(0,0,0,0.1)" : ["0 4px 6px rgba(0,0,0,0.1)", "0 8px 15px rgba(244, 63, 94, 0.2)", "0 4px 6px rgba(0,0,0,0.1)"]
+              }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ 
+                duration: 0.3,
+                boxShadow: {
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </motion.button>
+            
+            {/* Right Arrow - more prominent */}
+            <motion.button
+              className={`absolute right-6 top-1/2 transform -translate-y-1/2 bg-white text-rose-600 w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-40 ${currentSlide === slides.length - 1 ? 'opacity-40 cursor-not-allowed' : 'opacity-100 hover:bg-rose-50'}`}
+              whileHover={currentSlide < slides.length - 1 ? { scale: 1.1, x: 5 } : {}}
+              whileTap={currentSlide < slides.length - 1 ? { scale: 0.95 } : {}}
+              onClick={handleNext}
+              disabled={currentSlide === slides.length - 1}
+              aria-label="Next slide"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ 
+                opacity: currentSlide === slides.length - 1 ? 0.4 : 1, 
+                x: 0,
+                boxShadow: currentSlide === slides.length - 1 ? "0 4px 6px rgba(0,0,0,0.1)" : ["0 4px 6px rgba(0,0,0,0.1)", "0 8px 15px rgba(244, 63, 94, 0.2)", "0 4px 6px rgba(0,0,0,0.1)"]
+              }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ 
+                duration: 0.3,
+                boxShadow: {
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </motion.button>
+          </>
+        )}
+      </AnimatePresence>
+      
+      {/* Minimalist pagination dots */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-40 bg-white/50 backdrop-blur-sm rounded-full shadow-md px-4 py-1.5 flex items-center space-x-1">
+        {slides.map((_, index) => (
+          <motion.button
+            key={`dot-${index}`}
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${currentSlide === index ? 'bg-rose-500 w-3' : 'bg-rose-200 hover:bg-rose-300'}`}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => goToSlide(index)}
+            aria-label={`Go to slide ${index + 1}`}
           />
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <button 
-            className="text-xs text-rose-600 hover:text-rose-800 transition-colors"
-            onClick={() => setSpeed(prev => Math.min(prev + 1, 10))}
-          >
-            -
-          </button>
-          <span className="text-xs text-rose-600">Speed</span>
-          <button 
-            className="text-xs text-rose-600 hover:text-rose-800 transition-colors"
-            onClick={() => setSpeed(prev => Math.max(prev - 1, 1))}
-          >
-            +
-          </button>
-        </div>
+        ))}
       </div>
     </div>
   );
@@ -363,7 +774,7 @@ const Timeline = ({ guestName }) => {
   return (
     <ScrollAnimationProvider>
       <div 
-        className="fixed inset-0 overflow-y-auto overflow-x-hidden"
+        className="fixed inset-0 overflow-hidden"
         style={{ 
           backgroundImage: 'radial-gradient(circle at center, #ffe5e5 0%, #fff9f9 50%, #fff5f7 100%)',
         }}
@@ -388,86 +799,8 @@ const Timeline = ({ guestName }) => {
           ))}
         </div>
         
-        {/* Main Title - Fixed Header */}
-        <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-sm py-4 border-b border-rose-200">
-          <AnimatedSection 
-            animationType="scale"
-            className="text-4xl md:text-5xl font-bold text-rose-600 text-center"
-          >
-            Juliet's Bachelorette
-          </AnimatedSection>
-        </div>
-
-        {/* Welcome section */}
-        <div className="max-w-7xl mx-auto py-20 px-4 md:px-8 lg:px-10">
-          <RotatingCard className="p-6 md:p-8 w-full max-w-5xl mx-auto">
-            <AnimatedSection 
-              animationType="fade"
-              className="bg-white/50 backdrop-blur-lg rounded-xl shadow-2xl border border-white/40 p-6 md:p-8 transform-gpu relative z-20"
-            >
-              <h2 className="text-4xl font-bold mb-4 text-rose-600">Welcome, {guestName || 'Guest'}!</h2>
-              <h3 className="text-3xl font-bold mb-6 text-rose-600">Weekend Itinerary</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <AnimatedSection 
-                  animationType="slide"
-                  direction="left"
-                  delay={0.3}
-                  className="bg-white/40 backdrop-blur-sm rounded-xl shadow-lg p-5"
-                  whileHover={{ scale: 1.03 }}
-                >
-                  <h4 className="text-2xl font-bold mb-4 text-rose-600">Location</h4>
-                  <p className="text-xl mb-2 text-rose-600">Beautiful Boca Raton, FL</p>
-                  <p className="text-gray-600 mb-4">May 23rd - May 26th</p>
-                  
-                  <div className="bg-rose-100/70 rounded-lg aspect-video flex items-center justify-center overflow-hidden">
-                    <img src="/house.png" alt="Boca Raton beachfront" className="w-full h-full object-cover" />
-                  </div>
-                </AnimatedSection>
-                
-                <AnimatedSection 
-                  animationType="slide"
-                  direction="right"
-                  delay={0.4}
-                  className="bg-white/40 backdrop-blur-sm rounded-xl shadow-lg p-5"
-                >
-                  <h4 className="text-2xl font-bold mb-4 text-rose-600">Getting There</h4>
-                  <StaggeredEntry>
-                    <ul className="space-y-3 text-gray-600">
-                      <li className="flex items-start">
-                        <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
-                          <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
-                            <div className="w-2 h-2 bg-white rounded-full"></div>
-                          </div>
-                        </div>
-                        <p>Fly into Fort Lauderdale (FLL) or West Palm Beach (PBI) Airports</p>
-                      </li>
-                      <li className="flex items-start">
-                        <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
-                          <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
-                            <div className="w-2 h-2 bg-white rounded-full"></div>
-                          </div>
-                        </div>
-                        <p>Uber to our beachfront accommodation</p>
-                      </li>
-                      <li className="flex items-start">
-                        <div className="w-5 h-5 bg-rose-500 rounded-full flex-shrink-0 mt-1 mr-3">
-                          <div className="w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
-                            <div className="w-2 h-2 bg-white rounded-full"></div>
-                          </div>
-                        </div>
-                        <p>Pack your swimsuit, sunscreen, and dancing shoes!</p>
-                      </li>
-                    </ul>
-                  </StaggeredEntry>
-                </AnimatedSection>
-              </div>
-            </AnimatedSection>
-          </RotatingCard>
-        </div>
-
-        {/* Timeline section */}
-        <AutomaticTimeline timelineData={timelineData} />
+        {/* Main Viewport Carousel */}
+        <ViewportCarousel timelineData={timelineData} guestName={guestName} />
       </div>
     </ScrollAnimationProvider>
   );
