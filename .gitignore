@@ -1,6 +1,5 @@
 # dependencies
-node_modules/
-**/node_modules/
+node_modules
 /.pnp
 .pnp.js
 
@@ -59,3 +58,12 @@ Thumbs.db
 
 # Cursor editor
 .cursor/
+
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
