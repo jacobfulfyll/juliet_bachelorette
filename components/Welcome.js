@@ -10,12 +10,14 @@ const Welcome = ({ name, onContinue }) => {
   const getPersonalizedMessage = () => {
     const messages = {
       'Isabel': "Isabel! Thank you for being such an amazing friend to Juliet. Your presence will make this weekend extra special!",
-      'Nicolle': "Nicolle! Juliet is thrilled that you'll be part of her bachelorette weekend. Your friendship means the world to her!",
       'Kate': "Kate! Your adventure with Juliet continues with this exciting bachelorette weekend. Get ready for the fun!",
       'Erica': "Erica! Juliet is so grateful to have you as part of her bachelorette celebration. Let's make it unforgettable!",
-      'Alex': "Alex! Your presence at Juliet's bachelorette will bring so much joy. She can't wait to celebrate with you!",
       'Nikki': "Nikki! Get ready for an incredible weekend celebrating Juliet. Your friendship means so much to her!",
-      'Bethany': "Bethany! Juliet is beyond excited to have you at her bachelorette. Your friendship is truly cherished!"
+      'Bethany': "Bethany! Juliet is beyond excited to have you at her bachelorette. Your friendship is truly cherished!",
+      'Mary Pat': "Mary Pat! Juliet is thrilled that you'll be part of her bachelorette weekend. Your friendship means the world to her!",
+      'Madeleine': "Madeleine! Juliet is so happy you'll be part of her bachelorette celebration. Let's make it a weekend to remember!",
+      'Sasha': "Sasha! Juliet is beyond excited to have you at her bachelorette. Your friendship is truly cherished!",
+      'Bea': "Bea! Juliet is thrilled that you'll be part of her bachelorette weekend. Your friendship means the world to her!",
     };
     
     return messages[name] || `${name}! Juliet is so happy you'll be part of her bachelorette celebration!`;
